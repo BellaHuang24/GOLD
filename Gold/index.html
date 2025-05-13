@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALUXE 金价计算器</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f5f0; /* 米白背景 */
+        }
+        .calculator {
+            background-color: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #e8e8e8;
+        }
+        .logo {
+            display: block;
+            margin: 0 auto 15px;
+            max-width: 180px;
+            height: auto;
+            transition: all 0.3s;
+        }
+        .logo:hover {
+            transform: scale(1.03);
+        }
+        h1 {
+            color: #b8860b; /* 暗金色 */
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 22px;
+            letter-spacing: 1px;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #555;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+        input:focus {
+            border-color: #b8860b;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(184, 134, 11, 0.2);
+        }
+        button {
+            background: linear-gradient(to right, #b8860b, #d4af37);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: linear-gradient(to right, #a57609, #c9a227);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(184, 134, 11, 0.3);
+        }
+        .results {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #fffaf0;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px dashed #d4af37;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .final-price {
+            font-size: 26px;
+            color: #b8860b;
+            font-weight: bold;
+            margin: 12px 0;
+            font-family: 'Arial Rounded MT Bold', sans-serif;
+        }
+        .unit {
+            font-size: 14px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <!-- 公司Logo -->
+        <img src="logo.png" alt="ALUXE Logo" class="logo">
+        
+        <h1>金饰价格计算器</h1>
+        
+        <div class="form-group">
+            <label for="goldPrice">今日金价 (SGD/克):</label>
+            <input type="number" id="goldPrice" step="0.01" placeholder="例如: 85.50">
+        </div>
+        
+        <div class="form-group">
+            <label for="discount">ALUXE 黄金优惠 (SGD/克):</label>
+            <input type="number" id="discount" step="0.01" placeholder="例如: 5.00">
+        </div>
+        
+        <div class="form-group">
+            <label for="weight">金饰克重 (克):</label>
+            <input type="number" id="weight" step="0.01" placeholder="例如: 15.60">
+        </div>
+        
+        <div class="form-group">
+            <label for="craftFee">手工费 (SGD):</label>
+            <input type="number" id="craftFee" step="0.01" placeholder="例如: 120.00">
+        </div>
+        
+        <div class="form-group">
+            <label for="craftDiscount">手工费折扣 (%):</label>
+            <input type="number" id="craftDiscount" step="0.01" placeholder="例如: 10">
+        </div>
+        
+        <div class="form-group">
+            <label for="cashDiscount">手工费现金折扣 (SGD):</label>
+            <input type="number" id="cashDiscount" step="0.01" placeholder="例如: 20.00">
+        </div>
+        
+        <button onclick="calculatePrice()">计算最终价格</button>
+        
+        <div class="results" id="results" style="display: none;">
+            <div style="font-size: 18px;">加GST之后的金饰总价</div>
+            <div class="final-price" id="finalPrice"></div>
+            <div class="unit">SGD (包含9%消费税)</div>
+        </div>
+    </div>
+
+    <script>
+        function calculatePrice() {
+            // 获取输入值
+            const X = parseFloat(document.getElementById('goldPrice').value);
+            const a = parseFloat(document.getElementById('discount').value);
+            const Y = parseFloat(document.getElementById('weight').value);
+            const Z = parseFloat(document.getElementById('craftFee').value);
+            const b = parseFloat(document.getElementById('craftDiscount').value);
+            const c = parseFloat(document.getElementById('cashDiscount').value);
+            
+            // 验证输入
+            if (isNaN(X) || isNaN(a) || isNaN(Y) || isNaN(Z) || isNaN(b) || isNaN(c)) {
+                alert("请填写所有字段");
+                return;
+            }
+            
+            // 计算公式
+            const goldBasePrice = (X - a) * Y;
+            const discountedCraftFee = Z * (1 - b/100);
+            const finalPrice = (goldBasePrice + discountedCraftFee) * 1.09 - c;
+            
+            // 显示结果（保留2位小数）
+            document.getElementById('finalPrice').textContent = finalPrice.toFixed(2);
+            document.getElementById('results').style.display = 'block';
+            
+            // 平滑滚动到结果
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
